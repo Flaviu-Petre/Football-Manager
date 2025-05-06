@@ -1,0 +1,64 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Tema1.Core.DTOs;
+using Tema1.Core.Interfaces;
+
+
+namespace Tema1.Api.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PlayersController : ControllerBase
+    {
+        private readonly IPlayerService _playerService;
+
+        public PlayersController(IPlayerService playerService)
+        {
+            _playerService = playerService;
+        }
+
+        // GET: api/Players
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PlayerDto>>> GetAllPlayers()
+        {
+            var players = await _playerService.GetAllPlayersAsync();
+            return Ok(players);
+        }
+
+        // GET: api/Players/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PlayerDto>> GetPlayer(int id)
+        {
+            var player = await _playerService.GetPlayerByIdAsync(id);
+            if (player == null)
+            {
+                return NotFound();
+            }
+            return player;
+        }
+
+        // GET: api/Players/team/5
+        [HttpGet("team/{teamId}")]
+        public async Task<ActionResult<IEnumerable<PlayerDto>>> GetPlayersByTeam(int teamId)
+        {
+            var players = await _playerService.GetPlayersByTeamIdAsync(teamId);
+            return Ok(players);
+        }
+
+        // POST: api/Players
+        [HttpPost]
+        public async Task<ActionResult<PlayerDto>> CreatePlayer(PlayerDto playerDto)
+        {
+            try
+            {
+                var result = await _playerService.CreatePlayerAsync(playerDto);
+                return CreatedAtAction(nameof(GetPlayer), new { id = result.Id }, result);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    }
+}

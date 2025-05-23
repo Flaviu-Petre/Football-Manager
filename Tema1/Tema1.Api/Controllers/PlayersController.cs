@@ -18,28 +18,45 @@ namespace Tema1.Api.Controllers
             _playerService = playerService;
         }
 
-        // GET: api/Players
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PlayerDto>>> GetAllPlayers(
             [FromQuery] string? position = null,
-            [FromQuery] string? nationality = null)
+            [FromQuery] string? nationality = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
             var players = await _playerService.GetAllPlayersAsync();
+
+            var playerList = players.ToList();
 
             // Apply filtering
             if (!string.IsNullOrEmpty(position))
             {
-                players = players.Where(p => p.Position.Contains(position, StringComparison.OrdinalIgnoreCase));
+                playerList = playerList.Where(p => p.Position.Contains(position, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             if (!string.IsNullOrEmpty(nationality))
             {
-                players = players.Where(p => p.Nationality.Contains(nationality, StringComparison.OrdinalIgnoreCase));
+                playerList = playerList.Where(p => p.Nationality.Contains(nationality, StringComparison.OrdinalIgnoreCase)).ToList();      
             }
 
-            return Ok(players);
-        }
+            // Apply pagination
+            var totalCount = playerList.Count;
 
+            var pagedPlayers = playerList
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+
+            // Add pagination info to response headers
+            Response.Headers.Add("X-Total-Count", totalCount.ToString());
+            Response.Headers.Add("X-Page", page.ToString());
+            Response.Headers.Add("X-Page-Size", pageSize.ToString());
+            Response.Headers.Add("X-Total-Pages", ((int)Math.Ceiling((double)totalCount / pageSize)).ToString());
+
+            return Ok(pagedPlayers);
+        }
         // GET: api/Players/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PlayerDto>> GetPlayer(int id)

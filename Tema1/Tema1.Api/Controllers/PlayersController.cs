@@ -20,9 +20,23 @@ namespace Tema1.Api.Controllers
 
         // GET: api/Players
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlayerDto>>> GetAllPlayers()
+        public async Task<ActionResult<IEnumerable<PlayerDto>>> GetAllPlayers(
+            [FromQuery] string? position = null,
+            [FromQuery] string? nationality = null)
         {
             var players = await _playerService.GetAllPlayersAsync();
+
+            // Apply filtering
+            if (!string.IsNullOrEmpty(position))
+            {
+                players = players.Where(p => p.Position.Contains(position, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(nationality))
+            {
+                players = players.Where(p => p.Nationality.Contains(nationality, StringComparison.OrdinalIgnoreCase));
+            }
+
             return Ok(players);
         }
 

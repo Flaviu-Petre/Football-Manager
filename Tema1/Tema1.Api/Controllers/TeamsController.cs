@@ -19,9 +19,22 @@ namespace Tema1.Api.Controllers
 
         // GET: api/Teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeams(
+            [FromQuery] string? country = null,
+            [FromQuery] string? league = null)
         {
             var teams = await _teamService.GetAllTeamsAsync();
+
+            // Apply filtering
+            if (!string.IsNullOrEmpty(country))
+            {
+                teams = teams.Where(t => t.Country.Contains(country, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(league))
+             {
+                teams = teams.Where(t => t.League.Contains(league, StringComparison.OrdinalIgnoreCase));
+            }
             return Ok(teams);
         }
 

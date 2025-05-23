@@ -91,5 +91,31 @@ namespace Tema1.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // GET: api/Players/sorted?sortBy=goals
+        [HttpGet("sorted")]
+        public async Task<ActionResult<IEnumerable<PlayerDto>>> GetPlayersSorted(
+            [FromQuery] string sortBy = "name")
+        {
+            var players = await _playerService.GetAllPlayersAsync();
+            var playerList = players.ToList();
+
+            Console.WriteLine($"Received sortBy parameter: '{sortBy}'");
+
+            // Apply sorting - handle both lowercase and property names
+            var sortedPlayers = sortBy.ToLower() switch
+            {
+                "name" or "lastname" => playerList.OrderBy(p => p.LastName).ThenBy(p => p.FirstName).ToList(),
+                "age" => playerList.OrderBy(p => p.Age).ToList(),
+                "goals" or "goalsscored" => playerList.OrderByDescending(p => p.GoalsScored).ToList(),
+                "appearances" => playerList.OrderByDescending(p => p.Appearances).ToList(),
+                "shirtnumber" => playerList.OrderBy(p => p.ShirtNumber).ToList(),
+                _ => playerList.OrderBy(p => p.LastName).ThenBy(p => p.FirstName).ToList() // default to name
+            };
+
+            Console.WriteLine($"Sorted {sortedPlayers.Count} players by: {sortBy}");
+
+            return Ok(sortedPlayers);
+        }
     }
 }

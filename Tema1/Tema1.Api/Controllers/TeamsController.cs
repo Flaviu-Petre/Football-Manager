@@ -95,5 +95,29 @@ namespace Tema1.Api.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        // GET: api/Teams/sorted?sortBy=founded
+        [HttpGet("sorted")]
+        public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeamsSorted(
+            [FromQuery] string sortBy = "name")
+        {
+            var teams = await _teamService.GetAllTeamsAsync();
+            var teamList = teams.ToList();
+
+            // Apply sorting
+            var sortedTeams = sortBy.ToLower() switch
+            {
+                "name" => teamList.OrderBy(t => t.Name).ToList(),
+                "country" => teamList.OrderBy(t => t.Country).ThenBy(t => t.Name).ToList(),
+                "league" => teamList.OrderBy(t => t.League).ThenBy(t => t.Name).ToList(),
+                "founded" => teamList.OrderBy(t => t.YearFounded).ToList(),
+                "stadium" => teamList.OrderBy(t => t.Stadium).ToList(),
+                _ => teamList.OrderBy(t => t.Name).ToList() // default to name
+            };
+
+            Console.WriteLine($"Sorted {sortedTeams.Count} teams by: {sortBy}");
+
+            return Ok(sortedTeams);
+        }
     }
 }

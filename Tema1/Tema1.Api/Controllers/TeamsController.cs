@@ -17,26 +17,44 @@ namespace Tema1.Api.Controllers
             _teamService = teamService;
         }
 
-        // GET: api/Teams
+        // GET: api/Teams?country=Romania&league=Liga1&page=1&pageSize=10
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeams(
             [FromQuery] string? country = null,
-            [FromQuery] string? league = null)
+            [FromQuery] string? league = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
             var teams = await _teamService.GetAllTeamsAsync();
+            var teamList = teams.ToList();
 
             // Apply filtering
             if (!string.IsNullOrEmpty(country))
             {
-                teams = teams.Where(t => t.Country.Contains(country, StringComparison.OrdinalIgnoreCase));
+                teamList = teamList.Where(t => t.Country.Contains(country, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             if (!string.IsNullOrEmpty(league))
-             {
-                teams = teams.Where(t => t.League.Contains(league, StringComparison.OrdinalIgnoreCase));
+            {
+                teamList = teamList.Where(t => t.League.Contains(league, StringComparison.OrdinalIgnoreCase)).ToList();
             }
-            return Ok(teams);
+
+            // Apply pagination
+            var totalCount = teamList.Count;
+            var pagedTeams = teamList
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Add pagination info to response headers
+            Response.Headers.Add("X-Total-Count", totalCount.ToString());
+            Response.Headers.Add("X-Page", page.ToString());
+            Response.Headers.Add("X-Page-Size", pageSize.ToString());
+            Response.Headers.Add("X-Total-Pages", ((int)Math.Ceiling((double)totalCount / pageSize)).ToString());
+
+            return Ok(pagedTeams);
         }
+
 
         // GET: api/Teams/5
         [HttpGet("{id}")]

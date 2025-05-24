@@ -44,5 +44,12 @@ namespace Tema1.Database.Repositories
                 .Include(p => p.Team)
                 .ToListAsync();
         }
+
+        public async Task<Player?> UpdatePlayerAsync(Player player)
+        {
+            _context.Players.Update(player);
+            await _context.SaveChangesAsync();
+            return player;
+        }
     }
 }

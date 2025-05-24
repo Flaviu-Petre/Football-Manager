@@ -12,5 +12,6 @@ namespace Tema1.Database.Repositories
         Task<Team> AddTeamAsync(Team team);
 
         Task<bool> TeamExistsAsync(int id);
+        Task<Team?> UpdateTeamAsync(Team team);
     }
 }

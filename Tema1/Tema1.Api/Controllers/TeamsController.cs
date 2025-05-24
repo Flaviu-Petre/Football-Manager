@@ -119,5 +119,24 @@ namespace Tema1.Api.Controllers
 
             return Ok(sortedTeams);
         }
+
+        // PATCH: api/Teams/5
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<TeamDto>> UpdateTeam(int id, TeamUpdateDto teamUpdateDto)
+        {
+            try
+            {
+                var result = await _teamService.UpdateTeamAsync(id, teamUpdateDto);
+                if (result == null)
+                {
+                    return NotFound($"Team with ID {id} not found.");
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

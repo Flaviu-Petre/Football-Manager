@@ -102,5 +102,36 @@ namespace Tema1.Core.Services
                 CoachName = team.CoachName
             };
         }
+
+        public async Task<TeamDto?> UpdateTeamAsync(int id, TeamUpdateDto teamUpdateDto)
+        {
+            var existingTeam = await _teamRepository.GetTeamByIdAsync(id);
+            if (existingTeam == null)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(teamUpdateDto.Name))
+                existingTeam.Name = teamUpdateDto.Name;
+
+            if (!string.IsNullOrWhiteSpace(teamUpdateDto.Country))
+                existingTeam.Country = teamUpdateDto.Country;
+
+            if (!string.IsNullOrWhiteSpace(teamUpdateDto.League))
+                existingTeam.League = teamUpdateDto.League;
+
+            if (teamUpdateDto.YearFounded.HasValue)
+                existingTeam.YearFounded = teamUpdateDto.YearFounded.Value;
+
+            if (!string.IsNullOrWhiteSpace(teamUpdateDto.Stadium))
+                existingTeam.Stadium = teamUpdateDto.Stadium;
+
+            if (!string.IsNullOrWhiteSpace(teamUpdateDto.CoachName))
+                existingTeam.CoachName = teamUpdateDto.CoachName;
+
+            var updatedTeam = await _teamRepository.UpdateTeamAsync(existingTeam);
+            if (updatedTeam == null)
+                return null;
+
+            return MapTeamToDto(updatedTeam);
+        }
     }
 }

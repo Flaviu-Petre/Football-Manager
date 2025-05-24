@@ -11,5 +11,6 @@ namespace Tema1.Core.Interfaces
         Task<IEnumerable<PlayerDto>> GetPlayersByTeamIdAsync(int teamId);
         Task<PlayerDto> GetPlayerByIdAsync(int id);
         Task<PlayerDto> CreatePlayerAsync(PlayerDto playerDto);
+        Task<PlayerDto?> UpdatePlayerAsync(int id, PlayerUpdateDto playerUpdateDto);
     }
 }

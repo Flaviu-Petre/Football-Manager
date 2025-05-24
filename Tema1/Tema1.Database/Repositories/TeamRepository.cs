@@ -45,5 +45,12 @@ namespace Tema1.Infrastructure.Repositories
         {
             return await _context.Teams.AnyAsync(t => t.Id == id);
         }
+
+        public async Task<Team?> UpdateTeamAsync(Team team)
+        {
+            _context.Teams.Update(team);
+            await _context.SaveChangesAsync();
+            return team;
+        }
     }
 }

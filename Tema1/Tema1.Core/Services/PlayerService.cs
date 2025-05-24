@@ -96,5 +96,55 @@ namespace Tema1.Core.Services
 
             return players.Select(p => MapPlayerToDto(p, teamNames.GetValueOrDefault(p.TeamId, "Unknown Team")));
         }
+
+        public async Task<PlayerDto?> UpdatePlayerAsync(int id, PlayerUpdateDto playerUpdateDto)
+        {
+            var existingPlayer = await _playerRepository.GetPlayerByIdAsync(id);
+            if (existingPlayer == null)
+                return null;
+
+            if (playerUpdateDto.TeamId.HasValue)
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(playerUpdateDto.TeamId.Value);
+                if (team == null)
+                    throw new Exception($"Team with ID {playerUpdateDto.TeamId.Value} not found.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(playerUpdateDto.FirstName))
+                existingPlayer.FirstName = playerUpdateDto.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(playerUpdateDto.LastName))
+                existingPlayer.LastName = playerUpdateDto.LastName;
+
+            if (playerUpdateDto.DateOfBirth.HasValue)
+                existingPlayer.DateOfBirth = playerUpdateDto.DateOfBirth.Value;
+
+            if (!string.IsNullOrWhiteSpace(playerUpdateDto.Nationality))
+                existingPlayer.Nationality = playerUpdateDto.Nationality;
+
+            if (!string.IsNullOrWhiteSpace(playerUpdateDto.Position))
+                existingPlayer.Position = playerUpdateDto.Position;
+
+            if (playerUpdateDto.ShirtNumber.HasValue)
+                existingPlayer.ShirtNumber = playerUpdateDto.ShirtNumber.Value;
+
+            if (playerUpdateDto.GoalsScored.HasValue)
+                existingPlayer.GoalsScored = playerUpdateDto.GoalsScored.Value;
+
+            if (playerUpdateDto.Appearances.HasValue)
+                existingPlayer.Appearances = playerUpdateDto.Appearances.Value;
+
+            if (playerUpdateDto.TeamId.HasValue)
+                existingPlayer.TeamId = playerUpdateDto.TeamId.Value;
+
+            var updatedPlayer = await _playerRepository.UpdatePlayerAsync(existingPlayer);
+            if (updatedPlayer == null)
+                return null;
+
+            var teamEntity = await _teamRepository.GetTeamByIdAsync(updatedPlayer.TeamId);
+            string teamName = teamEntity?.Name ?? "Unknown Team";
+
+            return MapPlayerToDto(updatedPlayer, teamName);
+        }
     }
 }

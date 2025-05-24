@@ -117,5 +117,24 @@ namespace Tema1.Api.Controllers
 
             return Ok(sortedPlayers);
         }
+
+        // PATCH: api/Players/5
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<PlayerDto>> UpdatePlayer(int id, PlayerUpdateDto playerUpdateDto)
+        {
+            try
+            {
+                var result = await _playerService.UpdatePlayerAsync(id, playerUpdateDto);
+                if (result == null)
+                {
+                    return NotFound($"Player with ID {id} not found.");
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

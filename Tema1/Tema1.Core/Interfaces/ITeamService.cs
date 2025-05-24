@@ -15,5 +15,6 @@ namespace Tema1.Core.Interfaces
         Task<TeamWithPlayersDto> GetTeamWithPlayersAsync(int id);
 
         Task<TeamDto> CreateTeamAsync(TeamDto teamDto);
+        Task<TeamDto?> UpdateTeamAsync(int id, TeamUpdateDto teamUpdateDto);
     }
 }

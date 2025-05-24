@@ -11,5 +11,6 @@ namespace Tema1.Database.Repositories
         Task<IEnumerable<Player>> GetPlayersByTeamIdAsync(int teamId);
         Task<Player> GetPlayerByIdAsync(int id);
         Task<Player> AddPlayerAsync(Player player);
+        Task<Player?> UpdatePlayerAsync(Player player);
     }
 }

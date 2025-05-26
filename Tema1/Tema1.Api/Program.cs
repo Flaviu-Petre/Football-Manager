@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Tema1.Api.Middleware;
 using Tema1.Core;
 using Tema1.Database;
 using Tema1.Infrastructure.Config;
@@ -21,7 +22,7 @@ builder.Services.AddServices();
 
 var app = builder.Build();
 
-
+app.UseMiddleware<ErrorHandlingMiddleware>();
 AppConfig.Init(app.Configuration);
 
 //Am modificat aici

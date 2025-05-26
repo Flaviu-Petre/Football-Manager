@@ -61,11 +61,7 @@ namespace Tema1.Api.Controllers
         public async Task<ActionResult<TeamDto>> GetTeam(int id)
         {
             var team = await _teamService.GetTeamByIdAsync(id);
-            if (team == null)
-            {
-                return NotFound();
-            }
-            return team;
+            return Ok(team);
         }
 
         // GET: api/Teams/5/players
@@ -124,19 +120,8 @@ namespace Tema1.Api.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult<TeamDto>> UpdateTeam(int id, TeamUpdateDto teamUpdateDto)
         {
-            try
-            {
-                var result = await _teamService.UpdateTeamAsync(id, teamUpdateDto);
-                if (result == null)
-                {
-                    return NotFound($"Team with ID {id} not found.");
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _teamService.UpdateTeamAsync(id, teamUpdateDto);
+            return Ok(result);
         }
     }
 }

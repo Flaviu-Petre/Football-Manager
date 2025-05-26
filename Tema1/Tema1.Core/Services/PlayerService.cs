@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tema1.Core.DTOs;
+using Tema1.Core.Exceptions;
 using Tema1.Core.Interfaces;
 using Tema1.Database.Entities;
 using Tema1.Database.Repositories;
@@ -35,7 +36,8 @@ namespace Tema1.Core.Services
         public async Task<PlayerDto> GetPlayerByIdAsync(int id)
         {
             var player = await _playerRepository.GetPlayerByIdAsync(id);
-            if (player == null) return null;
+            if (player == null) 
+                throw new NotFoundException("Player", id);
 
             string teamName = player.Team?.Name ?? "Unknown Team";
             return MapPlayerToDto(player, teamName);
@@ -45,7 +47,7 @@ namespace Tema1.Core.Services
         {
             var team = await _teamRepository.GetTeamByIdAsync(playerDto.TeamId);
             if (team == null)
-                throw new Exception($"Team with ID {playerDto.TeamId} not found.");
+                throw new NotFoundException($"Team with ID {playerDto.TeamId} not found.");
 
             var player = new Player
             {
@@ -101,13 +103,13 @@ namespace Tema1.Core.Services
         {
             var existingPlayer = await _playerRepository.GetPlayerByIdAsync(id);
             if (existingPlayer == null)
-                return null;
+                throw new NotFoundException("Player", id);
 
             if (playerUpdateDto.TeamId.HasValue)
             {
                 var team = await _teamRepository.GetTeamByIdAsync(playerUpdateDto.TeamId.Value);
                 if (team == null)
-                    throw new Exception($"Team with ID {playerUpdateDto.TeamId.Value} not found.");
+                    throw new NotFoundException("Team", playerUpdateDto.TeamId.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(playerUpdateDto.FirstName))

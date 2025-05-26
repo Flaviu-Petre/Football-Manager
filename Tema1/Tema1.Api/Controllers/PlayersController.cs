@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tema1.Core.DTOs;
+using Tema1.Core.Exceptions;
 using Tema1.Core.Interfaces;
 
 
@@ -62,11 +63,7 @@ namespace Tema1.Api.Controllers
         public async Task<ActionResult<PlayerDto>> GetPlayer(int id)
         {
             var player = await _playerService.GetPlayerByIdAsync(id);
-            if (player == null)
-            {
-                return NotFound();
-            }
-            return player;
+            return Ok(player);
         }
 
         // GET: api/Players/team/5
@@ -122,19 +119,8 @@ namespace Tema1.Api.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult<PlayerDto>> UpdatePlayer(int id, PlayerUpdateDto playerUpdateDto)
         {
-            try
-            {
-                var result = await _playerService.UpdatePlayerAsync(id, playerUpdateDto);
-                if (result == null)
-                {
-                    return NotFound($"Player with ID {id} not found.");
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _playerService.UpdatePlayerAsync(id, playerUpdateDto);
+            return Ok(result);
         }
     }
 }

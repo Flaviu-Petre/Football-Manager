@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tema1.Core.DTOs;
+using Tema1.Core.Exceptions;
 using Tema1.Core.Interfaces;
 using Tema1.Database.Entities;
 using Tema1.Database.Repositories;
@@ -28,14 +29,17 @@ namespace Tema1.Core.Services
         public async Task<TeamDto> GetTeamByIdAsync(int id)
         {
             var team = await _teamRepository.GetTeamByIdAsync(id);
-            return team != null ? MapTeamToDto(team) : null;
+            if (team == null)
+                throw new NotFoundException("Team", id);
+
+            return MapTeamToDto(team);
         }
 
         public async Task<TeamWithPlayersDto> GetTeamWithPlayersAsync(int id)
         {
             var team = await _teamRepository.GetTeamWithPlayersAsync(id);
-            if (team == null) 
-                return null;
+            if (team == null)
+                throw new NotFoundException("Team", id);
 
             return new TeamWithPlayersDto
             {
@@ -107,7 +111,7 @@ namespace Tema1.Core.Services
         {
             var existingTeam = await _teamRepository.GetTeamByIdAsync(id);
             if (existingTeam == null)
-                return null;
+                throw new NotFoundException("Team", id);
 
             if (!string.IsNullOrWhiteSpace(teamUpdateDto.Name))
                 existingTeam.Name = teamUpdateDto.Name;
